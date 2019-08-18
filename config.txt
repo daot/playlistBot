@@ -1,0 +1,7 @@
+[DEFAULT]
+discord_token =
+discord_channel =
+spotify_client_id =
+spotify_client_secret =
+spotify_username =
+spotify_playlist_id = 
