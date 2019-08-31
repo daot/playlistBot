@@ -75,7 +75,7 @@ async def on_message(message):
         for word in message.content.split(" "):
             if re.match('HTTPS?://', word.upper()) is not None:
                 if message.content.upper().startswith('!DEL'):
-                    if config['DEFAULT']['admin_role'].upper() in [y.name.upper() for y in message.author.roles]:
+                    if config['DEFAULT']['moderator_role'].upper() in [y.name.upper() for y in message.author.roles]:
                         embed = discord.Embed(color=0x1ed760)
                         embed.set_author(name=editPlaylist(word, 1), url="https://open.spotify.com/playlist/{}".format(config['DEFAULT']['spotify_playlist_id']), icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1024px-Spotify_logo_without_text.svg.png")
                         await message.channel.send(embed=embed)
