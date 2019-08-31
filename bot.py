@@ -29,7 +29,7 @@ async def on_message(message):
     sp = spotipy.Spotify(auth=token)
     sp.trace = False
 
-    def getUrl(url):
+    def editPlaylist(url, action):
         print(str(datetime.datetime.now()) + ': Getting Tracks...')
 
         try:
@@ -55,9 +55,12 @@ async def on_message(message):
                     art = j['entitiesByUniqueId'][item]['thumbnailUrl']
 
             sp.user_playlist_remove_all_occurrences_of_tracks(user=config['DEFAULT']['spotify_username'], playlist_id=config['DEFAULT']['spotify_playlist_id'], tracks=[id])
-            sp.user_playlist_add_tracks(user=config['DEFAULT']['spotify_username'], playlist_id=config['DEFAULT']['spotify_playlist_id'], tracks=[id])
-            print(str(datetime.datetime.now()) + ": Added {} by {} to the Playlist".format(title, artist))
-            return [title, artist, art]
+            if action == 0:
+                sp.user_playlist_add_tracks(user=config['DEFAULT']['spotify_username'], playlist_id=config['DEFAULT']['spotify_playlist_id'], tracks=[id])
+                print(str(datetime.datetime.now()) + ": Added {} by {} to the Playlist".format(title, artist))
+                return [title, artist, art]
+            elif action == 1:
+                return "Track Successfully Deleted"
         except UnboundLocalError:
             print(str(datetime.datetime.now()) + ': Spotify URL Not Found')
             return "Spotify URL Not Found"
@@ -71,18 +74,28 @@ async def on_message(message):
     if str(message.channel.id) == str(config['DEFAULT']['discord_channel']):
         for word in message.content.split(" "):
             if re.match('HTTPS?://', word.upper()) is not None:
-                m = getUrl(word)
-                if len(m) == 3:
-                    embed = discord.Embed(color=0x1ed760)
-                    embed.set_author(name="Successfully Added to the Playlist", url="https://open.spotify.com/playlist/{}".format(config['DEFAULT']['spotify_playlist_id']), icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1024px-Spotify_logo_without_text.svg.png")
-                    embed.add_field(name='Title:', value=m[0])
-                    embed.add_field(name='Artist:', value=m[1], inline=False)
-                    embed.set_thumbnail(url=m[2])
-                    await message.channel.send(embed=embed)
+                if message.content.upper().startswith('!DEL'):
+                    if config['DEFAULT']['admin_role'].upper() in [y.name.upper() for y in message.author.roles]:
+                        embed = discord.Embed(color=0x1ed760)
+                        embed.set_author(name=editPlaylist(word, 1), url="https://open.spotify.com/playlist/{}".format(config['DEFAULT']['spotify_playlist_id']), icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1024px-Spotify_logo_without_text.svg.png")
+                        await message.channel.send(embed=embed)
+                    else:
+                        embed = discord.Embed(color=0x1ed760)
+                        embed.set_author(name="User Not Authorized to Delete Songs", url="https://open.spotify.com/playlist/{}".format(config['DEFAULT']['spotify_playlist_id']), icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1024px-Spotify_logo_without_text.svg.png")
+                        await message.channel.send(embed=embed)
                 else:
-                    embed = discord.Embed(color=0x1ed760)
-                    embed.set_author(name=m, url="https://open.spotify.com/playlist/{}".format(config['DEFAULT']['spotify_playlist_id']), icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1024px-Spotify_logo_without_text.svg.png")
-                    await message.channel.send(embed=embed)
+                    m = editPlaylist(word, 0)
+                    if len(m) == 3:
+                        embed = discord.Embed(color=0x1ed760)
+                        embed.set_author(name="Successfully Added to the Playlist", url="https://open.spotify.com/playlist/{}".format(config['DEFAULT']['spotify_playlist_id']), icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1024px-Spotify_logo_without_text.svg.png")
+                        embed.add_field(name='Title:', value=m[0])
+                        embed.add_field(name='Artist:', value=m[1], inline=False)
+                        embed.set_thumbnail(url=m[2])
+                        await message.channel.send(embed=embed)
+                    else:
+                        embed = discord.Embed(color=0x1ed760)
+                        embed.set_author(name=m, url="https://open.spotify.com/playlist/{}".format(config['DEFAULT']['spotify_playlist_id']), icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1024px-Spotify_logo_without_text.svg.png")
+                        await message.channel.send(embed=embed)
 
 if __name__ == '__main__':
     if os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.txt')):
