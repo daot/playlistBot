@@ -1,7 +1,7 @@
 [DEFAULT]
 discord_token =
 discord_channel =
-admin_role = admin
+moderator_role = moderator
 spotify_client_id =
 spotify_client_secret =
 spotify_username =
