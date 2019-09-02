@@ -71,9 +71,11 @@ async def on_message(message):
             print(str(datetime.datetime.now()) + ': Unknown Error: ' + str(e))
             return "Unknown Error: " + str(e)
 
+    gotlink = 0
     if str(message.channel.id) == str(config['DEFAULT']['discord_channel']):
         for word in message.content.split(" "):
             if re.match('HTTPS?://', word.upper()) is not None:
+                gotlink = 1
                 if message.content.upper().startswith('!DEL'):
                     if config['DEFAULT']['moderator_role'].upper() in [y.name.upper() for y in message.author.roles]:
                         embed = discord.Embed(color=0x1ed760)
@@ -96,6 +98,13 @@ async def on_message(message):
                         embed = discord.Embed(color=0x1ed760)
                         embed.set_author(name=m, url="https://open.spotify.com/playlist/{}".format(config['DEFAULT']['spotify_playlist_id']), icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1024px-Spotify_logo_without_text.svg.png")
                         await message.channel.send(embed=embed)
+
+    if gotlink == 0:
+        await message.delete()
+        embed = discord.Embed(color=0x1ed760)
+        embed.set_author(name="Only Links Are Allowed", url="https://open.spotify.com/playlist/{}".format(config['DEFAULT']['spotify_playlist_id']), icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1024px-Spotify_logo_without_text.svg.png")
+        response = await message.channel.send(embed=embed)
+        await response.delete(delay=3)
 
 if __name__ == '__main__':
     if os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.txt')):
