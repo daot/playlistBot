@@ -99,8 +99,7 @@ async def on_message(message):
                         embed.set_author(name=m, url="https://open.spotify.com/playlist/{}".format(config['DEFAULT']['spotify_playlist_id']), icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1024px-Spotify_logo_without_text.svg.png")
                         await message.channel.send(embed=embed)
 
-    if gotlink == 0:
-        if str(message.channel.id) == str(config['DEFAULT']['discord_channel']):
+        if gotlink == 0:
             await message.delete()
             embed = discord.Embed(color=0x1ed760)
             embed.set_author(name="Only Links Are Allowed", url="https://open.spotify.com/playlist/{}".format(config['DEFAULT']['spotify_playlist_id']), icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1024px-Spotify_logo_without_text.svg.png")
